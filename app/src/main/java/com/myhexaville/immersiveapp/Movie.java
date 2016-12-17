@@ -16,14 +16,56 @@
 
 package com.myhexaville.immersiveapp;
 
-public class Movie {
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v7.graphics.Palette;
+
+public class Movie implements Parcelable {
     private String mMovieUrl;
+    private  int mColor;
 
     public Movie(String mMovieUrl) {
         this.mMovieUrl = mMovieUrl;
     }
 
+
+    protected Movie(Parcel in) {
+        mMovieUrl = in.readString();
+        mColor = in.readInt();
+    }
+
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel in) {
+            return new Movie(in);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
+
     public String getMovieUrl() {
         return mMovieUrl;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(mMovieUrl);
+        parcel.writeInt(mColor);
+    }
+
+    public void setColor(int color) {
+        mColor = color;
+    }
+
+    public int getColor() {
+        return mColor;
     }
 }

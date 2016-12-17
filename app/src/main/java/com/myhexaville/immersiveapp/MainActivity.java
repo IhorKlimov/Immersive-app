@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupList() {
-        mBinding.list.setAdapter(new Adapter());
+        mBinding.list.setAdapter(new Adapter(this));
         mBinding.list.setLayoutManager(new LinearLayoutManager(this));
     }
 }

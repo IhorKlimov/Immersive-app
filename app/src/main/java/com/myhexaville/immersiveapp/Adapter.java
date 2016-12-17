@@ -16,29 +16,32 @@
 
 package com.myhexaville.immersiveapp;
 
+import android.app.Activity;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.myhexaville.immersiveapp.databinding.ListItemBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Holder> {
+    private static final String LOG_TAG = "Adapter";
     private List<Movie> mMovies = new ArrayList<>();
+    private Activity mActivity;
 
-    public Adapter() {
-        for (int i = 0; i < 10; i++) {
-            mMovies.add(new Movie("http://www.theonlinebeacon.com/wp-content/uploads/2016/01/star_wars_battlefront_dice.0.jpg"));
-            mMovies.add(new Movie("http://fantasynscifi.com/wp-content/uploads/2016/06/ogimage_img.jpg"));
-            mMovies.add(new Movie("https://secure.cdn2.wdpromedia.com/resize/mwImage/1/900/360/90/wdpromedia.disney.go.com/media/wdpro-hkdl-assets/prod/en-intl/system/images/hkdl-event-star-wars-hero-4character.jpg"));
-            mMovies.add(new Movie("http://a.dilcdn.com/bl/wp-content/uploads/sites/6/2016/01/sullust_04-2400x1200-795653638057.jpg"));
-            mMovies.add(new Movie("https://media.starwars.ea.com/content/starwars-ea-com/en_US/starwars/battlefront/_jcr_content/ogimage.img.jpeg"));
-            mMovies.add(new Movie("http://overmental.com/wp-content/uploads/2015/07/James-Earl-Jones-Darth-Vader-Star-Wars-Rebels-790x494.jpg"));
-            mMovies.add(new Movie("https://cdn1.vox-cdn.com/uploads/chorus_asset/file/7617317/star_wars_republic_command_hard_contact.png"));
-        }
+    public Adapter(Activity a) {
+        mActivity = a;
+
+        populateMovieList();
     }
 
     @Override
@@ -47,16 +50,69 @@ public class Adapter extends RecyclerView.Adapter<Holder> {
                 .inflate(LayoutInflater
                         .from(parent.getContext()), R.layout.list_item, parent, false);
 
-        return new Holder(inflate.getRoot());
+        return new Holder(mActivity, inflate.getRoot());
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, int position) {
-        holder.binding.setMovie(mMovies.get(position));
+    public void onBindViewHolder(final Holder holder, int position) {
+        final Movie movie = mMovies.get(position);
+        holder.setMovie(movie);
+
+        Glide.with(mActivity)
+                .load(movie.getMovieUrl())
+                .into(new ImageViewTarget<GlideDrawable>(holder.binding.image) {
+                    @Override
+                    protected void setResource(GlideDrawable resource) {
+                        setImage(resource);
+
+                        if (!hasExtractedColorAlready()) {
+                            extractColor(resource);
+                        }
+                    }
+
+                    private boolean hasExtractedColorAlready() {
+                        return movie.getColor() != 0;
+                    }
+
+                    private void setImage(GlideDrawable resource) {
+                        holder.binding.image.setImageDrawable(resource.getCurrent());
+                    }
+
+                    private void extractColor(GlideDrawable resource) {
+                        Bitmap b = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
+                        Palette p = Palette.from(b).generate();
+                        int defaultColor = mActivity.getResources().getColor(R.color.primary);
+
+
+//                        int color = p.getDominantColor(defaultColor);
+//                        int color = p.getMutedColor(defaultColor);
+//                        int color = p.getLightMutedColor(defaultColor);
+//                        int color = p.getDarkMutedColor(defaultColor);
+//                        int color = p.getVibrantColor(defaultColor);
+//                        int color = p.getLightVibrantColor(defaultColor);
+                        int color = p.getDarkVibrantColor(defaultColor);
+
+                        movie.setColor(color);
+                    }
+                });
     }
 
     @Override
     public int getItemCount() {
         return mMovies.size();
+    }
+
+    private void populateMovieList() {
+        for (int i = 0; i < 10; i++) {
+            mMovies.add(new Movie("http://www.theonlinebeacon.com/wp-content/uploads/2016/01/star_wars_battlefront_dice.0.jpg"));
+            mMovies.add(new Movie("http://fantasynscifi.com/wp-content/uploads/2016/06/ogimage_img.jpg"));
+            mMovies.add(new Movie("https://secure.cdn2.wdpromedia.com/resize/mwImage/1/900/360/90/wdpromedia.disney.go.com/media/wdpro-hkdl-assets/prod/en-intl/system/images/hkdl-event-star-wars-hero-4character.jpg"));
+            mMovies.add(new Movie("http://a.dilcdn.com/bl/wp-content/uploads/sites/6/2016/01/sullust_04-2400x1200-795653638057.jpg"));
+            mMovies.add(new Movie("https://media.starwars.ea.com/content/starwars-ea-com/en_US/starwars/battlefront/_jcr_content/ogimage.img.jpeg"));
+            mMovies.add(new Movie("http://overmental.com/wp-content/uploads/2015/07/James-Earl-Jones-Darth-Vader-Star-Wars-Rebels-790x494.jpg"));
+            mMovies.add(new Movie("https://cdn1.vox-cdn.com/uploads/chorus_asset/file/7617317/star_wars_republic_command_hard_contact.png"));
+            mMovies.add(new Movie("http://tech.co/wp-content/uploads/2015/09/flat-design-successful.png"));
+            mMovies.add(new Movie("http://digitalsynopsis.com/wp-content/uploads/2013/12/flat-design-rounded-corner-icons.jpg"));
+        }
     }
 }
