@@ -18,20 +18,23 @@ package com.myhexaville.immersiveapp;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v7.graphics.Palette;
 
 public class Movie implements Parcelable {
-    private String mMovieUrl;
-    private  int mColor;
+    private String mPosterUrl;
+    private int mBackgroundColor;
+    private int mTextColor;
 
     public Movie(String mMovieUrl) {
-        this.mMovieUrl = mMovieUrl;
+        this.mPosterUrl = mMovieUrl;
     }
 
 
     protected Movie(Parcel in) {
-        mMovieUrl = in.readString();
-        mColor = in.readInt();
+        mPosterUrl = in.readString();
+        int[] c = new int[2];
+        in.readIntArray(c);
+        mBackgroundColor = c[0];
+        mTextColor = c[1];
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -46,8 +49,8 @@ public class Movie implements Parcelable {
         }
     };
 
-    public String getMovieUrl() {
-        return mMovieUrl;
+    public String getPosterUrl() {
+        return mPosterUrl;
     }
 
     @Override
@@ -57,15 +60,24 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mMovieUrl);
-        parcel.writeInt(mColor);
+        parcel.writeString(mPosterUrl);
+        int[] c = new int[]{mBackgroundColor, mTextColor};
+        parcel.writeIntArray(c);
     }
 
-    public void setColor(int color) {
-        mColor = color;
+    public void setBackgroundColor(int color) {
+        mBackgroundColor = color;
     }
 
     public int getColor() {
-        return mColor;
+        return mBackgroundColor;
+    }
+
+    public int getTextColor() {
+        return mTextColor;
+    }
+
+    public void setTextColor(int mTextColor) {
+        this.mTextColor = mTextColor;
     }
 }

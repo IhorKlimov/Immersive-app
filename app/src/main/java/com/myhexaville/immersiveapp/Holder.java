@@ -19,7 +19,9 @@ package com.myhexaville.immersiveapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -32,20 +34,25 @@ public class Holder extends RecyclerView.ViewHolder {
     private Movie mMovie;
     ListItemBinding binding;
 
-    public Holder(Activity a, final View itemView) {
+    public Holder(final Activity a, final View itemView) {
         super(itemView);
         mActivity = a;
 
         binding = DataBindingUtil.bind(itemView);
 
 
-        itemView.setOnClickListener(new View.OnClickListener() {
+        binding.image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(LOG_TAG, "onClick: ");
                 Intent intent = new Intent(itemView.getContext(), DetailsActivity.class)
                         .putExtra(DetailsActivity.MOVIE, mMovie);
 
-                itemView.getContext().startActivity(intent);
+
+                Bundle b = ActivityOptionsCompat
+                        .makeSceneTransitionAnimation(a, binding.image, "image").toBundle();
+
+                itemView.getContext().startActivity(intent, b);
 
             }
         });

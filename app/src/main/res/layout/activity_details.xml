@@ -31,9 +31,9 @@
                 <ImageView
                     android:id="@+id/backdrop"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="450dp"
                     android:scaleType="centerCrop"
-                    app:imageUrl="@{movie.movieUrl}"
+                    android:transitionName="image"
                     app:layout_collapseMode="parallax" />
             </android.support.design.widget.CollapsingToolbarLayout>
         </android.support.design.widget.AppBarLayout>

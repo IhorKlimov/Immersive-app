@@ -19,12 +19,14 @@ package com.myhexaville.immersiveapp;
 import android.app.Activity;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.target.ImageViewTarget;
@@ -59,14 +61,15 @@ public class Adapter extends RecyclerView.Adapter<Holder> {
         holder.setMovie(movie);
 
         Glide.with(mActivity)
-                .load(movie.getMovieUrl())
+                .load(movie.getPosterUrl())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(new ImageViewTarget<GlideDrawable>(holder.binding.image) {
                     @Override
                     protected void setResource(GlideDrawable resource) {
                         setImage(resource);
 
                         if (!hasExtractedColorAlready()) {
-                            extractColor(resource);
+                            extractColors(resource);
                         }
                     }
 
@@ -78,21 +81,36 @@ public class Adapter extends RecyclerView.Adapter<Holder> {
                         holder.binding.image.setImageDrawable(resource.getCurrent());
                     }
 
-                    private void extractColor(GlideDrawable resource) {
+                    private void extractColors(GlideDrawable resource) {
                         Bitmap b = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
                         Palette p = Palette.from(b).generate();
+
+                        extractBackgroundColor(p);
+
+//                        extractTextColor(p);
+                    }
+
+                    private void extractBackgroundColor(Palette p) {
                         int defaultColor = mActivity.getResources().getColor(R.color.primary);
 
 
-//                        int color = p.getDominantColor(defaultColor);
-//                        int color = p.getMutedColor(defaultColor);
-//                        int color = p.getLightMutedColor(defaultColor);
-//                        int color = p.getDarkMutedColor(defaultColor);
-//                        int color = p.getVibrantColor(defaultColor);
-//                        int color = p.getLightVibrantColor(defaultColor);
+                        //                        int color = p.getDominantColor(defaultColor);
+                        //                        int color = p.getMutedColor(defaultColor);
+                        //                        int color = p.getLightMutedColor(defaultColor);
+                        //                        int color = p.getDarkMutedColor(defaultColor);
+                        //                        int color = p.getVibrantColor(defaultColor);
+                        //                        int color = p.getLightVibrantColor(defaultColor);
                         int color = p.getDarkVibrantColor(defaultColor);
+                        movie.setBackgroundColor(color);
+                    }
 
-                        movie.setColor(color);
+                    private void extractTextColor(Palette p) {
+                        Palette.Swatch swatch = p.getDarkVibrantSwatch();
+                        int textColor = Color.parseColor("#ffffff");
+                        if (swatch!= null) {
+                            textColor = swatch.getBodyTextColor();
+                        }
+                        movie.setTextColor(textColor);
                     }
                 });
     }
